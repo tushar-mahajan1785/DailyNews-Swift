@@ -38,6 +38,7 @@ class OtherNewsTableViewCell: UITableViewCell {
         objBackView.addSubview(objUIImageView)
         
         objUITextViewTitle = UITextView()
+        objUITextViewTitle.isUserInteractionEnabled = false
         objUITextViewTitle.isEditable = false
         objUITextViewTitle.isScrollEnabled = false
         objUITextViewTitle.text = "homework if cupidatat consumer to find pleasure"
@@ -53,17 +54,17 @@ class OtherNewsTableViewCell: UITableViewCell {
         
         objUIButtonViews = UIButton()
         objUIButtonViews.contentHorizontalAlignment = UIControlContentHorizontalAlignment.left
-        objUIButtonViews.setImage(UIImage.init(named: "like"), for: UIControlState.normal)
+        objUIButtonViews.setImage(UIImage.init(named: "eye"), for: UIControlState.normal)
         objUIButtonViews.setTitle("123", for: UIControlState.normal)
-        objUIButtonViews.titleLabel?.font = UIFont.systemFont(ofSize: 14)
+        objUIButtonViews.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         objUIButtonViews.setTitleColor(UIColor.black, for: UIControlState.normal)
         objBackView.addSubview(objUIButtonViews)
 
         objUIButtonLike = UIButton()
         objUIButtonLike.contentHorizontalAlignment = UIControlContentHorizontalAlignment.left
-        objUIButtonLike.setImage(UIImage.init(named: "eye"), for: UIControlState.normal)
+        objUIButtonLike.setImage(UIImage.init(named: "like"), for: UIControlState.normal)
         objUIButtonLike.setTitle("247", for: UIControlState.normal)
-        objUIButtonLike.titleLabel?.font = UIFont.systemFont(ofSize: 14)
+        objUIButtonLike.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         objUIButtonLike.setTitleColor(UIColor.black, for: UIControlState.normal)
         objBackView.addSubview(objUIButtonLike)
         
