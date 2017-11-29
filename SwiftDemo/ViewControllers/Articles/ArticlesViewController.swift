@@ -54,7 +54,6 @@ class ArticlesViewController: UIViewController, UITableViewDelegate, UITableView
                 self.arrHeaders = NSMutableArray.init(array: (json as! NSDictionary).allKeys.reversed())
                 self.objUITableViewArticles.reloadData()
             }
-            
         }
     }
     
