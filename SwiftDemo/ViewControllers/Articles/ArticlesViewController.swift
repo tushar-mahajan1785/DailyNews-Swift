@@ -10,12 +10,10 @@ import UIKit
 import Alamofire
 import AlamofireImage
 
-class ArticlesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDelegate, UICollectionViewDataSource {
+class ArticlesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     var objDailyNews : NSDictionary = NSDictionary.init()
     var arrHeaders : NSMutableArray = NSMutableArray.init()
-    var intSection : Int = 0
-    var storedOffsets = [Int: CGFloat]()
     
     let objUITableViewArticles : UITableView = {
         let tableView = UITableView()
@@ -56,6 +54,7 @@ class ArticlesViewController: UIViewController, UITableViewDelegate, UITableView
                 self.arrHeaders = NSMutableArray.init(array: (json as! NSDictionary).allKeys.reversed())
                 self.objUITableViewArticles.reloadData()
             }
+            
         }
     }
     
@@ -69,18 +68,6 @@ class ArticlesViewController: UIViewController, UITableViewDelegate, UITableView
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let arrNewsCount = (objDailyNews.object(forKey: arrHeaders.object(at: section)) as! NSArray).count
         return  arrNewsCount > 0 ? arrNewsCount : 0
-    }
-    
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard let tableViewCell = cell as? GallariesTableViewCell else { return }
-        tableViewCell.setCollectionViewDataSourceDelegate(dataSourceDelegate: self, forSection: indexPath.section, forRow: indexPath.row)
-        tableViewCell.collectionViewOffset = storedOffsets[indexPath.row] ?? 0
-    }
-    
-    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard let tableViewCell = cell as? GallariesTableViewCell else { return }
-        
-        storedOffsets[indexPath.row] = tableViewCell.collectionViewOffset
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -106,30 +93,18 @@ class ArticlesViewController: UIViewController, UITableViewDelegate, UITableView
                 placeholderImage: UIImage.init(named: "placeholder")
             )
             cell.objUITextViewTitle.text = dictionaryNew["title"] as? String
-            cell.objUIButtonViews.setTitle(" \(dictionaryNew["views"] as! Int)" , for: UIControlState.normal)
-            cell.objUIButtonLike.setTitle(" \(dictionaryNew["likes"] as! Int)" , for: UIControlState.normal)
+            cell.objUIButtonViews.setTitle(String(describing: dictionaryNew["views"] as! Int) , for: UIControlState.normal)
+            cell.objUIButtonLike.setTitle(String(describing: dictionaryNew["likes"] as! Int) , for: UIControlState.normal)
             cell.objUIButtonCategory.setTitle(String(describing: dictionaryNew["category"] as! String), for: UIControlState.normal)
             return cell
         case 2:// Gallaries
-            intSection = indexPath.section
             let dictionaryNew : NSMutableDictionary = NSMutableDictionary.init(dictionary: (arrNews.object(at: indexPath.row) as! NSDictionary))
             let cell = GallariesTableViewCell.init(style: UITableViewCellStyle.default, reuseIdentifier: "galleriesCell")
-            
-            // Title
-            let objUITextViewTitle = UITextView()
-            objUITextViewTitle.isEditable = false
-            objUITextViewTitle.isScrollEnabled = false
-            objUITextViewTitle.isUserInteractionEnabled = false
-            objUITextViewTitle.text = dictionaryNew.object(forKey: "artist") as! String
-            objUITextViewTitle.font = UIFont.boldSystemFont(ofSize: 26)
-            objUITextViewTitle.textColor = UIColor.white
-            objUITextViewTitle.backgroundColor = UIColor.clear
-            cell.contentView.addSubview(objUITextViewTitle)
-            
-            objUITextViewTitle.translatesAutoresizingMaskIntoConstraints = false
-            objUITextViewTitle.leftAnchor.constraint(equalTo: cell.contentView.leftAnchor, constant: 10).isActive = true
-            objUITextViewTitle.rightAnchor.constraint(equalTo: cell.contentView.rightAnchor, constant: -10).isActive = true
-            objUITextViewTitle.bottomAnchor.constraint(equalTo: cell.contentView.bottomAnchor, constant: -20).isActive = true
+            cell.objUITextViewTitle.text = dictionaryNew.object(forKey: "artist") as? String
+            cell.objUIImageView.af_setImage(
+                withURL: URL.init(string: (((dictionaryNew.object(forKey: "images") as? NSArray)?.object(at: 0) as? NSDictionary)?.object(forKey: "img") as? String)!)!,
+                placeholderImage: UIImage.init(named: "placeholder")
+            )
             return cell
         default:
             let cell = UITableViewCell.init(style: UITableViewCellStyle.default, reuseIdentifier: "default")
@@ -144,7 +119,7 @@ class ArticlesViewController: UIViewController, UITableViewDelegate, UITableView
         
         // Header Title
         let headerTitle = UILabel()
-        headerTitle.font = UIFont.systemFont(ofSize: 22, weight: UIFont.Weight.bold)
+        headerTitle.font = UIFont.systemFont(ofSize: 22, weight: UIFont.Weight.medium)
         headerTitle.text = (arrHeaders.object(at: section) as? String)?.localizedCapitalized.replacingOccurrences(of: "_", with: " ")
         headerTitle.textColor = UIColor.black
         headerView.addSubview(headerTitle)
@@ -164,10 +139,19 @@ class ArticlesViewController: UIViewController, UITableViewDelegate, UITableView
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         switch indexPath.section {
         case 0:
+            if AppConstants.DeviceType.IS_IPAD {
+                return 300
+            }
             return 200
         case 1:
+            if AppConstants.DeviceType.IS_IPAD {
+                return 250
+            }
             return 150
         case 2:
+            if AppConstants.DeviceType.IS_IPAD {
+                return 350
+            }
             return 250
         default:
             return 0
@@ -175,50 +159,7 @@ class ArticlesViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let arrNews : NSMutableArray = NSMutableArray.init(array: objDailyNews.object(forKey: arrHeaders.object(at: indexPath.section)) as! NSArray)
-        let dictionaryNew : NSMutableDictionary = NSMutableDictionary.init(dictionary: (arrNews.object(at: indexPath.row) as! NSDictionary))
-
-        AppConstants.UserDefaultManager.setValue(dictionaryNew, forKey: "news")
         self.navigationController?.pushViewController((self.storyboard?.instantiateViewController(withIdentifier: "ArticleDetailsViewController"))!, animated: true)
-    }
-    
-    
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let arrNews : NSMutableArray = NSMutableArray.init(array: (objDailyNews.object(forKey: arrHeaders.object(at: intSection)) as? NSArray)!)
-        print("COLLECTIONVIEW METHOD : \(arrNews)")
-        return ((arrNews.object(at: collectionView.tag) as? NSDictionary)!.object(forKey: "images") as? NSArray)!.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let arrNews : NSMutableArray = NSMutableArray.init(array: (objDailyNews.object(forKey: arrHeaders.object(at: intSection)) as? NSArray)!)
-        let dictionaryNew : NSMutableDictionary = NSMutableDictionary.init(dictionary: (arrNews.object(at: collectionView.tag) as! NSDictionary))
-
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell",
-                                                      for: indexPath)
-        let objUIImageView = UIImageView()
-        objUIImageView.af_setImage(
-            withURL: URL.init(string: (((dictionaryNew.object(forKey: "images") as? NSArray)?.object(at: indexPath.row) as? NSDictionary)?.object(forKey: "img") as? String)!)!,
-            placeholderImage: UIImage.init(named: "placeholder")
-        )
-
-        objUIImageView.contentMode = UIViewContentMode.scaleToFill
-        cell.contentView.addSubview(objUIImageView)
-        objUIImageView.translatesAutoresizingMaskIntoConstraints = false
-        objUIImageView.centerXAnchor.constraint(equalTo: cell.contentView.centerXAnchor, constant: 0).isActive = true
-        objUIImageView.centerYAnchor.constraint(equalTo: cell.contentView.centerYAnchor, constant: 0).isActive = true
-        objUIImageView.widthAnchor.constraint(equalTo: cell.contentView.widthAnchor, constant: 0).isActive = true
-        objUIImageView.heightAnchor.constraint(equalTo: cell.contentView.heightAnchor, constant: 0).isActive = true
-        
-        return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        let arrNews : NSMutableArray = NSMutableArray.init(array: (objDailyNews.object(forKey: arrHeaders.object(at: intSection)) as? NSArray)!)
-//        let dictionaryNew : NSMutableDictionary = NSMutableDictionary.init(dictionary: (arrNews.object(at: collectionView.tag) as! NSDictionary))
-//
-//        AppConstants.UserDefaultManager.setValue(dictionaryNew, forKey: "news")
-//        self.navigationController?.pushViewController((self.storyboard?.instantiateViewController(withIdentifier: "GalleryDetailViewController"))!, animated: true)
     }
     
     override func didReceiveMemoryWarning() {

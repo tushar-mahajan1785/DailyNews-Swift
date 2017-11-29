@@ -9,7 +9,7 @@
 import UIKit
 
 class ArticleDetailsViewController: UIViewController {
-    
+
     // ScrollView
     let objUIScrollView : UIScrollView = {
         let scrollView = UIScrollView()
@@ -19,11 +19,10 @@ class ArticleDetailsViewController: UIViewController {
     
     // Views Count
     let objUIButtonViews: UIButton = {
-        
         let button = UIButton()
         button.contentHorizontalAlignment = UIControlContentHorizontalAlignment.left
         button.setImage(UIImage.init(named: "eye"), for: UIControlState.normal)
-        button.setTitle(" \((AppConstants.UserDefaultManager.value(forKey: "news") as! NSDictionary).object(forKey: "views") as! Int)", for: UIControlState.normal)
+        button.setTitle(" 200", for: UIControlState.normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         button.setTitleColor(UIColor.gray, for: UIControlState.normal)
         button.imageEdgeInsets = UIEdgeInsetsMake(5, 0, 5, 0)
@@ -36,7 +35,7 @@ class ArticleDetailsViewController: UIViewController {
         let button = UIButton()
         button.contentHorizontalAlignment = UIControlContentHorizontalAlignment.left
         button.setImage(UIImage.init(named: "like"), for: UIControlState.normal)
-        button.setTitle(" \((AppConstants.UserDefaultManager.value(forKey: "news") as! NSDictionary).object(forKey: "likes") as! Int)", for: UIControlState.normal)
+        button.setTitle(" 25", for: UIControlState.normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         button.setTitleColor(UIColor.gray, for: UIControlState.normal)
         button.imageEdgeInsets = UIEdgeInsetsMake(5, 0, 5, 0)
@@ -49,7 +48,7 @@ class ArticleDetailsViewController: UIViewController {
         let button = UIButton()
         button.contentHorizontalAlignment = UIControlContentHorizontalAlignment.left
         button.setImage(UIImage.init(named: "dislike"), for: UIControlState.normal)
-        button.setTitle(" \((AppConstants.UserDefaultManager.value(forKey: "news") as! NSDictionary).object(forKey: "dislikes") as! Int)", for: UIControlState.normal)
+        button.setTitle(" 16", for: UIControlState.normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         button.setTitleColor(UIColor.gray, for: UIControlState.normal)
         button.imageEdgeInsets = UIEdgeInsetsMake(5, 0, 5, 0)
@@ -63,7 +62,7 @@ class ArticleDetailsViewController: UIViewController {
         textView.isEditable = false
         textView.font = UIFont.boldSystemFont(ofSize: 22)
         textView.textColor = UIColor.black
-        textView.text = (AppConstants.UserDefaultManager.value(forKey: "news") as! NSDictionary).object(forKey: "title") as? String
+        textView.text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit"
         return textView
     }()
     
@@ -74,7 +73,7 @@ class ArticleDetailsViewController: UIViewController {
         textView.backgroundColor = UIColor.white
 
         let startText : NSAttributedString =  NSAttributedString(string: "Article by ", attributes: [NSAttributedStringKey.foregroundColor : AppConstants.Colors.COLOR_BLUE, NSAttributedStringKey.font : UIFont.systemFont(ofSize: 12)])
-        let endText : NSAttributedString = NSAttributedString(string: ((AppConstants.UserDefaultManager.value(forKey: "news") as! NSDictionary).object(forKey: "author") as? String)!, attributes: [NSAttributedStringKey.foregroundColor : AppConstants.Colors.COLOR_BLUE, NSAttributedStringKey.font : UIFont.boldSystemFont(ofSize: 12)])
+        let endText : NSAttributedString = NSAttributedString(string: "Jon Record", attributes: [NSAttributedStringKey.foregroundColor : AppConstants.Colors.COLOR_BLUE, NSAttributedStringKey.font : UIFont.boldSystemFont(ofSize: 12)])
         let mutableString : NSMutableAttributedString = NSMutableAttributedString(attributedString: startText)
         mutableString.append(endText)
         textView.attributedText = mutableString
@@ -83,10 +82,7 @@ class ArticleDetailsViewController: UIViewController {
     
     let objUIImageViewArticle : UIImageView = {
         let imageView = UIImageView()
-        imageView.af_setImage(
-            withURL: URL.init(string: ((AppConstants.UserDefaultManager.value(forKey: "news") as! NSDictionary).object(forKey: "img") as? String)!)!,
-            placeholderImage: UIImage.init(named: "placeholder")
-        )
+        imageView.image = UIImage.init(named: "3.jpg")
         return imageView
     }()
     
@@ -96,7 +92,7 @@ class ArticleDetailsViewController: UIViewController {
         textView.isEditable = false
         textView.font = UIFont.systemFont(ofSize: 14)
         textView.textColor = UIColor.black
-        textView.text = (AppConstants.UserDefaultManager.value(forKey: "news") as! NSDictionary).object(forKey: "body") as? String
+        textView.text = "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat."
         return textView
     }()
     
@@ -111,14 +107,13 @@ class ArticleDetailsViewController: UIViewController {
         view.addSubview(objUIScrollView)
         
         objUIScrollView.addSubview(objUIButtonViews)
+        
         objUIScrollView.addSubview(objUIButtonLike)
         objUIScrollView.addSubview(objUIButtonDisLike)
-
+        
         objUIScrollView.addSubview(objUITextViewTitle)
         objUIScrollView.addSubview(objUITextViewArticleBy)
-        
         objUIScrollView.addSubview(objUIImageViewArticle)
-        
         objUIScrollView.addSubview(objUITextViewDescription)
         
         setupLayout()
