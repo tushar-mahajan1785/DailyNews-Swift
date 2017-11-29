@@ -1,15 +1,23 @@
 //
-//  ArticleDetailsViewController.swift
+//  GalleryDetailViewController.swift
 //  SwiftDemo
 //
-//  Created by Capternal on 26/10/17.
+//  Created by Capternal on 30/10/17.
 //  Copyright © 2017 Capternal. All rights reserved.
 //
 
 import UIKit
 
-class ArticleDetailsViewController: UIViewController {
+class GalleryDetailViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
     
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        <#code#>
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        <#code#>
+    }
+
     // ScrollView
     let objUIScrollView : UIScrollView = {
         let scrollView = UIScrollView()
@@ -72,23 +80,38 @@ class ArticleDetailsViewController: UIViewController {
         textView.isScrollEnabled = false
         textView.isEditable = false
         textView.backgroundColor = UIColor.white
-
-        let startText : NSAttributedString =  NSAttributedString(string: "Article by ", attributes: [NSAttributedStringKey.foregroundColor : AppConstants.Colors.COLOR_BLUE, NSAttributedStringKey.font : UIFont.systemFont(ofSize: 12)])
-        let endText : NSAttributedString = NSAttributedString(string: ((AppConstants.UserDefaultManager.value(forKey: "news") as! NSDictionary).object(forKey: "author") as? String)!, attributes: [NSAttributedStringKey.foregroundColor : AppConstants.Colors.COLOR_BLUE, NSAttributedStringKey.font : UIFont.boldSystemFont(ofSize: 12)])
+        
+        let startText : NSAttributedString =  NSAttributedString(string: "Artist : ", attributes: [NSAttributedStringKey.foregroundColor : AppConstants.Colors.COLOR_BLUE, NSAttributedStringKey.font : UIFont.systemFont(ofSize: 22)])
+        let endText : NSAttributedString = NSAttributedString(string: ((AppConstants.UserDefaultManager.value(forKey: "news") as! NSDictionary).object(forKey: "artist") as? String)!, attributes: [NSAttributedStringKey.foregroundColor : AppConstants.Colors.COLOR_BLUE, NSAttributedStringKey.font : UIFont.boldSystemFont(ofSize: 22)])
         let mutableString : NSMutableAttributedString = NSMutableAttributedString(attributedString: startText)
         mutableString.append(endText)
         textView.attributedText = mutableString
         return textView
     }()
     
-    let objUIImageViewArticle : UIImageView = {
-        let imageView = UIImageView()
-        imageView.af_setImage(
-            withURL: URL.init(string: ((AppConstants.UserDefaultManager.value(forKey: "news") as! NSDictionary).object(forKey: "img") as? String)!)!,
-            placeholderImage: UIImage.init(named: "placeholder")
-        )
-        return imageView
+    let objUICollectionView : UICollectionView = {
+        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        layout.itemSize = CGSize(width: AppConstants.ScreenSize.SCREEN_WIDTH, height: AppConstants.ScreenSize.SCREEN_HEIGHT*0.30)
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = 0
+        layout.minimumInteritemSpacing = 0
+        
+        let collectionView = UICollectionView(frame: CGRect.init(x: 0, y: 0, width: AppConstants.ScreenSize.SCREEN_WIDTH, height: AppConstants.ScreenSize.SCREEN_HEIGHT*0.30), collectionViewLayout: layout)
+        collectionView.isPagingEnabled = true
+        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "Cell")
+        
+        return collectionView
     }()
+    
+//    let objUIImageViewArticle : UIImageView = {
+//        let imageView = UIImageView()
+//        imageView.af_setImage(
+//            withURL: URL.init(string: ((AppConstants.UserDefaultManager.value(forKey: "news") as! NSDictionary).object(forKey: "img") as? String)!)!,
+//            placeholderImage: UIImage.init(named: "placeholder")
+//        )
+//        return imageView
+//    }()
     
     let objUITextViewDescription : UITextView = {
         let textView = UITextView()
@@ -96,7 +119,7 @@ class ArticleDetailsViewController: UIViewController {
         textView.isEditable = false
         textView.font = UIFont.systemFont(ofSize: 14)
         textView.textColor = UIColor.black
-        textView.text = (AppConstants.UserDefaultManager.value(forKey: "news") as! NSDictionary).object(forKey: "body") as? String
+        textView.text = (AppConstants.UserDefaultManager.value(forKey: "news") as! NSDictionary).object(forKey: "desc") as? String
         return textView
     }()
     
@@ -105,7 +128,7 @@ class ArticleDetailsViewController: UIViewController {
         self.title = AppConstants.ScreenTitles.DAILY_NEWS
         loadUI()
     }
-
+    
     private func loadUI() {
         // Add All objects in Controller View
         view.addSubview(objUIScrollView)
@@ -113,12 +136,14 @@ class ArticleDetailsViewController: UIViewController {
         objUIScrollView.addSubview(objUIButtonViews)
         objUIScrollView.addSubview(objUIButtonLike)
         objUIScrollView.addSubview(objUIButtonDisLike)
-
+        
         objUIScrollView.addSubview(objUITextViewTitle)
         objUIScrollView.addSubview(objUITextViewArticleBy)
         
-        objUIScrollView.addSubview(objUIImageViewArticle)
+        objUICollectionView.delegate = self
+        objUICollectionView.dataSource = self
         
+        objUIScrollView.addSubview(objUICollectionView)
         objUIScrollView.addSubview(objUITextViewDescription)
         
         setupLayout()
@@ -137,17 +162,17 @@ class ArticleDetailsViewController: UIViewController {
         objUIButtonViews.leftAnchor.constraint(equalTo: objUIScrollView.leftAnchor, constant: 5).isActive = true
         objUIButtonViews.topAnchor.constraint(equalTo: objUIScrollView.topAnchor, constant: 5).isActive = true
         objUIButtonViews.heightAnchor.constraint(equalToConstant: 30).isActive = true
-
+        
         objUIButtonLike.translatesAutoresizingMaskIntoConstraints = false
         objUIButtonLike.leftAnchor.constraint(equalTo: objUIButtonViews.rightAnchor, constant: 10).isActive = true
         objUIButtonLike.topAnchor.constraint(equalTo: objUIButtonViews.topAnchor, constant: 0).isActive = true
         objUIButtonLike.heightAnchor.constraint(equalToConstant: 30).isActive = true
-
+        
         objUIButtonDisLike.translatesAutoresizingMaskIntoConstraints = false
         objUIButtonDisLike.leftAnchor.constraint(equalTo: objUIButtonLike.rightAnchor, constant: 10).isActive = true
         objUIButtonDisLike.topAnchor.constraint(equalTo: objUIButtonViews.topAnchor, constant: 0).isActive = true
         objUIButtonDisLike.heightAnchor.constraint(equalToConstant: 30).isActive = true
-
+        
         objUITextViewTitle.translatesAutoresizingMaskIntoConstraints = false
         objUITextViewTitle.topAnchor.constraint(equalTo: objUIButtonDisLike.bottomAnchor, constant: 10).isActive = true
         objUITextViewTitle.leftAnchor.constraint(equalTo: objUIScrollView.leftAnchor, constant: 0).isActive = true
@@ -159,15 +184,21 @@ class ArticleDetailsViewController: UIViewController {
         objUITextViewArticleBy.leftAnchor.constraint(equalTo: objUIScrollView.leftAnchor, constant: 0).isActive = true
         objUITextViewArticleBy.rightAnchor.constraint(equalTo: objUIScrollView.rightAnchor, constant: 0).isActive = true
         objUITextViewArticleBy.heightAnchor.constraint(equalToConstant: 30).isActive = true
-
-        objUIImageViewArticle.translatesAutoresizingMaskIntoConstraints = false
-        objUIImageViewArticle.topAnchor.constraint(equalTo: objUITextViewArticleBy.bottomAnchor, constant: 0).isActive = true
-        objUIImageViewArticle.leftAnchor.constraint(equalTo: objUIScrollView.leftAnchor, constant: 0).isActive = true
-        objUIImageViewArticle.rightAnchor.constraint(equalTo: objUIScrollView.rightAnchor, constant: 0).isActive = true
-        objUIImageViewArticle.heightAnchor.constraint(equalToConstant: 200).isActive = true
         
+        objUICollectionView.translatesAutoresizingMaskIntoConstraints = false
+        objUICollectionView.topAnchor.constraint(equalTo: objUITextViewArticleBy.bottomAnchor, constant: 0)
+        objUICollectionView.leftAnchor.constraint(equalTo: objUIScrollView.leftAnchor, constant: 0).isActive = true
+        objUICollectionView.rightAnchor.constraint(equalTo: objUIScrollView.rightAnchor, constant: 0).isActive = true
+        objUICollectionView.heightAnchor.constraint(equalTo: objUIScrollView.heightAnchor, constant: AppConstants.ScreenSize.SCREEN_HEIGHT*0.30).isActive = true
+        
+//        objUIImageViewArticle.translatesAutoresizingMaskIntoConstraints = false
+//        objUIImageViewArticle.topAnchor.constraint(equalTo: objUITextViewArticleBy.bottomAnchor, constant: 0).isActive = true
+//        objUIImageViewArticle.leftAnchor.constraint(equalTo: objUIScrollView.leftAnchor, constant: 0).isActive = true
+//        objUIImageViewArticle.rightAnchor.constraint(equalTo: objUIScrollView.rightAnchor, constant: 0).isActive = true
+//        objUIImageViewArticle.heightAnchor.constraint(equalToConstant: 200).isActive = true
+//
         objUITextViewDescription.translatesAutoresizingMaskIntoConstraints = false
-        objUITextViewDescription.topAnchor.constraint(equalTo: objUIImageViewArticle.bottomAnchor, constant:10).isActive = true
+        objUITextViewDescription.topAnchor.constraint(equalTo: objUICollectionView.bottomAnchor, constant:10).isActive = true
         objUITextViewDescription.leftAnchor.constraint(equalTo: objUIScrollView.leftAnchor, constant: 10).isActive = true
         objUITextViewDescription.rightAnchor.constraint(equalTo: objUIScrollView.rightAnchor, constant: -10).isActive = true
         objUITextViewDescription.bottomAnchor.constraint(equalTo: objUIScrollView.bottomAnchor).isActive = true
@@ -178,15 +209,15 @@ class ArticleDetailsViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-
+    
     /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
+     // MARK: - Navigation
+     
+     // In a storyboard-based application, you will often want to do a little preparation before navigation
+     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+     // Get the new view controller using segue.destinationViewController.
+     // Pass the selected object to the new view controller.
+     }
+     */
 
 }
